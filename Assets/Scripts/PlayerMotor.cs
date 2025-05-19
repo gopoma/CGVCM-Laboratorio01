@@ -20,12 +20,20 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField]
     private float bulletSpeed = 2400f;
 
+    AudioManager audioManager;
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();    
 
         Cursor.lockState = CursorLockMode.Locked;
+
+        audioManager.PlayMusic(audioManager.background);
     }
 
     // Update is called once per frame
@@ -74,6 +82,15 @@ public class PlayerMotor : MonoBehaviour
     {
         GameObject bullet = Instantiate(bulletPrefab, bulletPoint.transform.position, transform.rotation);
         bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bulletSpeed);
+        audioManager.PlaySFX(audioManager.shot);
         Destroy(bullet, 2);
+        StartCoroutine(ExecuteAfterDelay(2f));
+    }
+
+    IEnumerator ExecuteAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        audioManager.PlaySFX(audioManager.explosion);
+
     }
 }
